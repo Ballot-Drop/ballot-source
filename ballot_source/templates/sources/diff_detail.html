@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Diff Detail</h2>
+{{diff.source}} <br />
+
+{% if diff.previous_diff %}
+<a href="{% url 'sources:diff' source_pk=diff.source.pk pk=diff.previous_diff.pk %}">Previous Diff</a>
+{% else %}
+No earlier diffs
+{% endif %}
+{% if diff.next_diff %}
+<a href="{% url 'sources:diff' source_pk=diff.source.pk pk=diff.next_diff.pk %}">Next Diff</a>
+{% else %}
+No later diffs
+{% endif %}
+
+<hr/>
+
+{% if not diff.previous_diff %}
+This is the first diff - nothing to show!
+{% else %}
+
+
+{% if diff.text_diff %}
+<pre>
+  {{diff.text_diff}}
+</pre>
+{% endif %}
+
+{% if diff.html_diff %}
+  <iframe srcdoc="{{diff.html_diff}}" width="800" height="600"></iframe>
+{% endif %}
+
+{% endif %}
+{% endblock %}

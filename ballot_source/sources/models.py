@@ -58,10 +58,17 @@ class SourceDetail(models.Model):
     raw_html = models.TextField()
     html_diff = models.TextField(null=True, blank=True)
     text_diff = models.TextField(null=True, blank=True)
-    last_pull = models.ForeignKey(
+    previous_diff = models.ForeignKey(
         "self",
         on_delete=models.SET_NULL,
-        related_name="next_pull",
+        related_name="_next_diff",
+        null=True,
+        blank=True,
+    )
+    next_diff = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        related_name="_prev_diff",
         null=True,
         blank=True,
     )
@@ -72,6 +79,7 @@ class SourceDetail(models.Model):
     )
     HEADERS = {"User-Agent": USER_AGENT, "Content-Type": "text/html"}
 
+    # todo: only save scrape if there's a change
     def save(self, *args, **kwargs):
         update_source = not self.pk
         if not self.pk:
@@ -80,21 +88,29 @@ class SourceDetail(models.Model):
                 "-date_pulled"
             )
             if source_pulls.count():
-                self.last_pull = source_pulls.first()
+                self.previous_diff = source_pulls.first()
 
             # grab html
             self.pull_html()
 
             # compare
-            if self.last_pull:
+            if self.previous_diff:
                 self.compare_html()
 
+                if not self.text_diff:
+                    # Don't save if there aren't diffs
+                    # todo: testing around this
+                    return None
         super(SourceDetail, self).save(*args, **kwargs)
         if update_source:
             self.source.last_checked = datetime.datetime.now(
                 pytz.timezone("America/Denver")
             )
             self.source.save()
+            if self.previous_diff:
+                self.previous_diff.next_diff = self
+                self.previous_diff.save()
+                # todo: add testing around ^
 
     def pull_html(self):
         response = requests.get(self.source.url, self.HEADERS)
@@ -107,7 +123,7 @@ class SourceDetail(models.Model):
     def compare_html(self):
         new_soup = list(BeautifulSoup(self.raw_html, "html.parser").stripped_strings)
         old_soup = list(
-            BeautifulSoup(self.last_pull.raw_html, "html.parser").stripped_strings
+            BeautifulSoup(self.previous_diff.raw_html, "html.parser").stripped_strings
         )
         self.html_diff = difflib.HtmlDiff().make_file(
             old_soup, new_soup, context=True, numlines=5
