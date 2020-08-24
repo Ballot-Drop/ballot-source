@@ -23,7 +23,7 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # though not all of them may be available with every OS.
 # In Windows, this must be set to your system time zone.
-TIME_ZONE = "US-Denver"
+TIME_ZONE = "America/Denver"
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = "en-us"
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
@@ -41,9 +41,7 @@ LOCALE_PATHS = [str(ROOT_DIR / "locale")]
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
-DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres:///ballot_source")
-}
+DATABASES = {"default": env.db("DATABASE_URL", default="postgres:///ballot_source")}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # URLS
@@ -76,6 +74,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "ballot_source.users.apps.UsersConfig",
     # Your stuff: custom apps go here
+    "ballot_source.sources.apps.SourcesConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
