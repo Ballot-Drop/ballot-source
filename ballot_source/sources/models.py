@@ -31,6 +31,7 @@ class Source(models.Model):
     source_type = models.CharField(
         choices=SOURCE_TYPE_CHOICES, default="OTHER", max_length=20
     )
+    fips = models.CharField(max_length=5, blank=True, null=True)
 
 
 class SourceDetail(models.Model):
