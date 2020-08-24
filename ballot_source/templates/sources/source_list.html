@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Sources</h2>
+<ul>
+  {% for source in object_list %}
+  <li>{{ source.url }} - {{source.details.count}}</li>
+  {% endfor %}
+</ul>
+{% endblock %}
