@@ -1,3 +1,9 @@
+import datetime
+import difflib
+
+import pytz
+import requests
+from bs4 import BeautifulSoup
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -36,9 +42,74 @@ class Source(models.Model):
     def __str__(self):
         return f"{self.source_type}: {self.url}"
 
+    def save(self, *args, **kwargs):
+        pull_source = self.pk is None
+        super(Source, self).save(*args, **kwargs)
+        if pull_source:
+            SourceDetail.objects.create(source=self)
+
+    def scrape(self):
+        SourceDetail.objects.create(source=self)
+
 
 class SourceDetail(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name="details")
     date_pulled = models.DateTimeField(auto_now_add=True)
     raw_html = models.TextField()
-    diff = models.TextField()
+    html_diff = models.TextField(null=True, blank=True)
+    text_diff = models.TextField(null=True, blank=True)
+    last_pull = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        related_name="next_pull",
+        null=True,
+        blank=True,
+    )
+
+    USER_AGENT = (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36"
+    )
+    HEADERS = {"User-Agent": USER_AGENT, "Content-Type": "text/html"}
+
+    def save(self, *args, **kwargs):
+        update_source = not self.pk
+        if not self.pk:
+            # get last pull
+            source_pulls = SourceDetail.objects.filter(source=self.source).order_by(
+                "-date_pulled"
+            )
+            if source_pulls.count():
+                self.last_pull = source_pulls.first()
+
+            # grab html
+            self.pull_html()
+
+            # compare
+            if self.last_pull:
+                self.compare_html()
+
+        super(SourceDetail, self).save(*args, **kwargs)
+        if update_source:
+            self.source.last_checked = datetime.datetime.now(
+                pytz.timezone("America/Denver")
+            )
+            self.source.save()
+
+    def pull_html(self):
+        response = requests.get(self.source.url, self.HEADERS)
+        if response.status_code != 200:
+            # do something
+            pass
+        else:
+            self.raw_html = response.text
+
+    def compare_html(self):
+        new_soup = list(BeautifulSoup(self.raw_html, "html.parser").stripped_strings)
+        old_soup = list(
+            BeautifulSoup(self.last_pull.raw_html, "html.parser").stripped_strings
+        )
+        self.html_diff = difflib.HtmlDiff().make_file(
+            old_soup, new_soup, context=True, numlines=5
+        )
+        self.text_diff = "".join(difflib.unified_diff(old_soup, new_soup))
