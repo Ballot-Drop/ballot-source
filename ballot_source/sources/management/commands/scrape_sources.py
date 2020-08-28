@@ -10,8 +10,9 @@ class Command(BaseCommand):
         for source in Source.objects.all():
             self.stdout.write(self.style.NOTICE(f"Scraping {source}"))
             source.scrape()
-            msg = "Success"
-            if source.details.last().text_diff != "":
+            msg = "Success: No differences found"
+
+            if source.details.last().date_pulled == source.last_checked:
                 msg = "Success: Differences found"
 
             self.stdout.write(self.style.SUCCESS(msg))

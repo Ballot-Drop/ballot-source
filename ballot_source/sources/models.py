@@ -1,11 +1,10 @@
-import datetime
 import difflib
 
-import pytz
 import requests
 from bs4 import BeautifulSoup
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils import timezone
 
 
 class Source(models.Model):
@@ -16,7 +15,7 @@ class Source(models.Model):
         ("OTHER", "Other"),
     ]
 
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(
         get_user_model(),
         blank=True,
@@ -51,10 +50,14 @@ class Source(models.Model):
     def scrape(self):
         SourceDetail.objects.create(source=self)
 
+    @property
+    def last_changed(self):
+        return SourceDetail.objects.filter(source=self).order_by("-date_pulled").first()
+
 
 class SourceDetail(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name="details")
-    date_pulled = models.DateTimeField(auto_now_add=True)
+    date_pulled = models.DateTimeField(default=timezone.now)
     raw_html = models.TextField()
     html_diff = models.TextField(null=True, blank=True)
     text_diff = models.TextField(null=True, blank=True)
@@ -79,10 +82,14 @@ class SourceDetail(models.Model):
     )
     HEADERS = {"User-Agent": USER_AGENT, "Content-Type": "text/html"}
 
-    # todo: only save scrape if there's a change
     def save(self, *args, **kwargs):
-        update_source = not self.pk
+        # update_source = not self.pk
+        timestamp = timezone.localtime()
         if not self.pk:
+            # update source last checked
+            self.source.last_checked = timestamp
+            self.source.save()
+
             # get last pull
             source_pulls = SourceDetail.objects.filter(source=self.source).order_by(
                 "-date_pulled"
@@ -101,16 +108,13 @@ class SourceDetail(models.Model):
                     # Don't save if there aren't diffs
                     # todo: testing around this
                     return None
+            self.date_pulled = timestamp
         super(SourceDetail, self).save(*args, **kwargs)
-        if update_source:
-            self.source.last_checked = datetime.datetime.now(
-                pytz.timezone("America/Denver")
-            )
-            self.source.save()
-            if self.previous_diff:
-                self.previous_diff.next_diff = self
-                self.previous_diff.save()
-                # todo: add testing around ^
+
+        if self.previous_diff:
+            self.previous_diff.next_diff = self
+            self.previous_diff.save()
+            # todo: add testing around ^
 
     def pull_html(self):
         response = requests.get(self.source.url, self.HEADERS)

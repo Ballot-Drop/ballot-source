@@ -4,7 +4,15 @@
 <h2>Sources</h2>
 <ul>
   {% for source in object_list %}
-  <li>{{ source.url }} - {{source.details.count}}</li>
+  <li>
+    <a href="{{ source.url }}">{{source.url}}</a><br />
+    {{source.details.count}} changes<br />
+    last checked: {{source.last_checked}}<br />
+    last changed:
+    <a href="{%url 'sources:diff' source_pk=source.pk pk=source.last_changed.pk %}">
+      {{source.last_changed.date_pulled}}
+    </a>
+  </li>
   {% endfor %}
 </ul>
 {% endblock %}
