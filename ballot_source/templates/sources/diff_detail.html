@@ -3,6 +3,9 @@
 {% block content %}
 <h2>Diff Detail</h2>
 {{diff.source}} <br />
+  <a href="{% url 'sources:detail' pk=diff.source.pk %}">View source</a> -
+  <a href="{% url 'sources:edit' pk=diff.source.pk %}">Edit source</a><br />
+
 
 {% if diff.previous_diff %}
 <a href="{% url 'sources:diff' source_pk=diff.source.pk pk=diff.previous_diff.pk %}">Previous Diff</a>
