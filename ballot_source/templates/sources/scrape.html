@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  {% if source %}
+    <h2>Scraping {{ source}}</h2>
+    {% if changes %}
+      There were changes!
+      <a href="{% url 'sources:diff' pk=source.last_changed.pk source_pk=source.pk %}">{{ source }}</a>
+      {% else %}
+      No changes found
+    {% endif %}
+  {% else %}
+    <h2>Scrape all sources</h2>
+  Successfully scraped all sites
+  {% if changes %}
+    The following sites have changes:
+    <ul>
+    {% for source in changes %}
+      <li><a href="{% url 'sources:diff' pk=source.last_changed.pk source_pk=source.pk %}">{{ source }}</a></li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+  {% endif %}
+
+{% endblock %}

@@ -1,7 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
-from django.views.generic import DetailView, FormView, ListView, UpdateView
+from django.views.generic import (
+    DetailView,
+    FormView,
+    ListView,
+    TemplateView,
+    UpdateView,
+)
 
 from .forms import SourceForm
 from .models import Source, SourceDetail
@@ -46,3 +52,29 @@ class DiffView(LoginRequiredMixin, DetailView):
     model = SourceDetail
     context_object_name = "diff"
     template_name = "sources/diff_detail.html"
+
+
+class ScrapeView(LoginRequiredMixin, TemplateView):
+    template_name = "sources/scrape.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if context.get("pk", None):
+            source = Source.objects.get(pk=context.get("pk"))
+            context["source"] = source
+            source.scrape()
+            if source.details.first().date_pulled == source.last_checked:
+                context["changes"] = [source]
+        else:
+            changes = []
+            for source in Source.objects.all():
+                # self.stdout.write(self.style.NOTICE(f"Scraping {source}"))
+                source.scrape()
+                # msg = "Success: No differences found"
+
+                if source.details.first().date_pulled == source.last_checked:
+                    # msg = "Success: Differences found"
+                    changes.append(source)
+
+            context["changes"] = changes
+        return context

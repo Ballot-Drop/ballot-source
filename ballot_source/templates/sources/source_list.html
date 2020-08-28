@@ -2,10 +2,13 @@
 
 {% block content %}
 <h2>Sources</h2>
+  <a href="{% url 'sources:new' %}">Add new source</a><br />
+  <a href="{% url 'sources:scrape' %}">Scrape all sources</a>
 <ul>
   {% for source in object_list %}
   <li>
-    <a href="{{ source.url }}">{{source.url}}</a><br />
+    <a href="{{ source.url }}">{{source.url}} <small>Links offsite</small></a><br />
+    <a href="{% url 'sources:detail' pk=source.pk %}">See source and all changes</a>
     {{source.details.count}} changes<br />
     last checked: {{source.last_checked}}<br />
     last changed:

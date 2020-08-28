@@ -2,7 +2,8 @@
 
 {% block content %}
 <h2>Source Detail</h2>
-{{object}}
+{{object}} - <a href="{% url 'sources:edit' pk=object.pk %}">Edit</a> -
+  <a href="{% url 'sources:scrape' pk=object.pk %}">Scrape</a>
 <ul>
 {% for detail in object.details.all %}
   <li><a href="{% url 'sources:diff' source_pk=detail.source.pk pk=detail.pk %}">{{detail.date_pulled}}</a></li>
