@@ -143,7 +143,7 @@ EMAIL_SUBJECT_PREFIX = env("DJANGO_EMAIL_SUBJECT_PREFIX", default="[Ballot Sourc
 # Collectfast
 # ------------------------------------------------------------------------------
 # https://github.com/antonagestam/collectfast#installation
-INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa F405
+# INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa F405
 
 # LOGGING
 # ------------------------------------------------------------------------------
