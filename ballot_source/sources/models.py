@@ -7,6 +7,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 
+from .states import STATES
+
 
 class Source(models.Model):
     SOURCE_TYPE_CHOICES = [
@@ -38,6 +40,7 @@ class Source(models.Model):
         choices=SOURCE_TYPE_CHOICES, default="OTHER", max_length=20
     )
     fips = models.CharField(max_length=5, blank=True, null=True)
+    state = models.CharField(choices=STATES, blank=True, null=True, max_length=2)
 
     def __str__(self):
         return f"{self.source_type}: {self.url}"
@@ -145,3 +148,9 @@ class SourceDetail(models.Model):
 
     class Meta:
         ordering = ["-date_pulled"]
+
+
+class Fips(models.Model):
+    fips = models.CharField(max_length=5, blank=False, null=False)
+    county = models.CharField(max_length=255, blank=False, null=False)
+    state = models.CharField(choices=STATES, max_length=2, blank=False, null=False)

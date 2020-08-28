@@ -5,7 +5,7 @@ from .models import Source, SourceDetail
 
 @admin.register(Source)
 class SourceAdmin(admin.ModelAdmin):
-    list_display = ("source_type", "url", "fips")
+    list_display = ("source_type", "url", "state", "fips")
 
 
 @admin.register(SourceDetail)
