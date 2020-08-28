@@ -8,11 +8,11 @@ from .models import Source, SourceDetail
 
 class SourceListView(ListView):
     model = Source
-    # todo: order by date desc
 
 
 class SourceDetailView(DetailView):
     model = Source
+    ordering = ["-last_checked"]
 
 
 class DiffView(DetailView):

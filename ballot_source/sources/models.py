@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 
 
@@ -53,6 +54,9 @@ class Source(models.Model):
     @property
     def last_changed(self):
         return SourceDetail.objects.filter(source=self).order_by("-date_pulled").first()
+
+    def get_absolute_url(self):
+        return reverse("sources:detail", args=[str(self.id)])
 
 
 class SourceDetail(models.Model):
@@ -133,3 +137,11 @@ class SourceDetail(models.Model):
             old_soup, new_soup, context=True, numlines=5
         )
         self.text_diff = "".join(difflib.unified_diff(old_soup, new_soup))
+
+    def get_absolute_url(self):
+        return reverse(
+            "sources:diff", kwargs={"pk": self.pk, "source_pk": self.source.pk}
+        )
+
+    class Meta:
+        ordering = ["-date_pulled"]
