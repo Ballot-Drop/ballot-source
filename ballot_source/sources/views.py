@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
-from django.views.generic import DetailView, FormView, ListView
+from django.views.generic import DetailView, FormView, ListView, UpdateView
 
 from .forms import SourceForm
 from .models import Source, SourceDetail
@@ -16,7 +16,7 @@ class SourceDetailView(LoginRequiredMixin, DetailView):
     ordering = ["-last_checked"]
 
 
-class SourceNewView(LoginRequiredMixin, FormView):
+class SourceFormView(LoginRequiredMixin, FormView):
     form_class = SourceForm
     template_name = "sources/source_create.html"
     success_url = reverse_lazy("sources:detail")
@@ -24,10 +24,22 @@ class SourceNewView(LoginRequiredMixin, FormView):
     def form_valid(self, form):
         source = form.save()
         self.pk = source.pk
-        return super(SourceNewView, self).form_valid(form)
+        self.add_another = True if form.data.get("add_another", False) else False
+        return super(SourceFormView, self).form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self, **kwargs):
+        if self.add_another:
+            return reverse("sources:new")
         return reverse("sources:detail", kwargs={"pk": self.pk})
+
+
+class SourceEditView(LoginRequiredMixin, UpdateView):
+    form_class = SourceForm
+    template_name = "sources/source_create.html"
+
+    def get_object(self, queryset=None):
+        obj = Source.objects.get(pk=self.kwargs["pk"])
+        return obj
 
 
 class DiffView(LoginRequiredMixin, DetailView):

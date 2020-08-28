@@ -1,10 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Source Create</h2>
+  {% if object %}
+    <h2>Edit Source</h2>
+    <em>{{ object }}</em>
+
+  {% else %}
+<h2>Add new source</h2>
+  {% endif %}
   <form method="post">{% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Save">
+
+  {% if not object %}
+    <input type="submit" name="save" value="Save and go to source">
+    <input type="submit" name="add_another" value="Save and add another">
+  {% else %}
+    <input type="submit" value="Update">
+  {% endif %}
   </form>
 
 {% endblock %}
