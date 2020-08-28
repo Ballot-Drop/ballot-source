@@ -29,7 +29,9 @@ class Command(BaseCommand):
                 html_msg += f"""
                     <li>
                         {source.url} -
-                        <a href='{Site.objects.get_current().domain}{source.get_absolute_url()}'>See changes</a>
+                        <a href='{Site.objects.get_current().domain}{source.last_changed.get_absolute_url()}'>
+                            See changes
+                        </a>
                     </li>
                     """
             html_msg += "</ul>"
