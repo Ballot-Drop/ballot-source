@@ -37,8 +37,8 @@ class SourceDetailTestCase(TestCase):
         source = Source.objects.create(url="http://www.randomword.com")
         source.scrape()
         source.scrape()
-        self.assertIsNone(SourceDetail.objects.first().html_diff)
-        self.assertIsNotNone(SourceDetail.objects.last().html_diff)
+        self.assertIsNone(SourceDetail.objects.last().html_diff)
+        self.assertIsNotNone(SourceDetail.objects.first().html_diff)
         # text diff is empty if there are no changes
         # self.assertEqual(SourceDetail.objects.last().text_diff, "")
 
@@ -47,4 +47,4 @@ class SourceDetailTestCase(TestCase):
         source.scrape()
         source.url = "http://www.github.com"
         source.scrape()
-        self.assertIsNotNone(SourceDetail.objects.last().text_diff)
+        self.assertIsNotNone(SourceDetail.objects.first().text_diff)
