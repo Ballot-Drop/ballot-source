@@ -154,3 +154,7 @@ class Fips(models.Model):
     fips = models.CharField(max_length=5, blank=False, null=False)
     county = models.CharField(max_length=255, blank=False, null=False)
     state = models.CharField(choices=STATES, max_length=2, blank=False, null=False)
+
+    class Meta:
+        verbose_name_plural = "Fips"
+        ordering = ["fips"]
