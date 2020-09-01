@@ -13,6 +13,9 @@ class SourceForm(forms.ModelForm):
     def clean_url(self):
         self.cleaned_data = super(SourceForm, self).clean()
         url = self.cleaned_data["url"]
+
+        Source.validate_url(url)
+
         try:
             requests.get(url)
         except requests.exceptions.ConnectionError:

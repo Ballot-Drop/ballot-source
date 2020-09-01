@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from .models import Source, SourceDetail
@@ -48,3 +49,21 @@ class SourceDetailTestCase(TestCase):
         source.url = "http://www.github.com"
         source.scrape()
         self.assertIsNotNone(SourceDetail.objects.first().text_diff)
+
+    def test_unique_url(self):
+        Source.objects.create(url="http://www.google.com")
+        base_url = "google.com"
+        duplicates = [
+            f"http://www.{base_url}",
+            f"https://www.{base_url}",
+            f"http://{base_url}",
+            f"https://{base_url}",
+            f"http://www.{base_url}/",
+            f"https://www.{base_url}/",
+            f"http://{base_url}/",
+            f"https://{base_url}/",
+        ]
+
+        for dupe in duplicates:
+            with self.assertRaises(ValidationError):
+                Source.objects.create(url=dupe)

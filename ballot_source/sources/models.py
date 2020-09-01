@@ -1,8 +1,10 @@
 import difflib
+import re
 
 import requests
 from bs4 import BeautifulSoup
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -35,7 +37,7 @@ class Source(models.Model):
         related_name="sources_updated",
     )
     last_checked = models.DateTimeField(null=True, blank=True)
-    url = models.URLField()
+    url = models.URLField(unique=True)
     source_type = models.CharField(
         choices=SOURCE_TYPE_CHOICES, default="OTHER", max_length=20
     )
@@ -46,6 +48,9 @@ class Source(models.Model):
         return f"{self.source_type}: {self.url}"
 
     def save(self, *args, **kwargs):
+        # Check for duplicate url
+        Source.validate_url(self.url, self.pk)
+
         pull_source = self.pk is None
         super(Source, self).save(*args, **kwargs)
         if pull_source:
@@ -60,6 +65,27 @@ class Source(models.Model):
 
     def get_absolute_url(self):
         return reverse("sources:detail", args=[str(self.id)])
+
+    @staticmethod
+    def strip_url(url):
+        stripped_url = re.sub(r"https?://", "", url).replace("www.", "")
+        stripped_url = re.sub(r"/$", "", stripped_url)
+        return stripped_url
+
+    @classmethod
+    def validate_url(cls, url, pk=None):
+        similar_urls = Source.objects.filter(url__contains=cls.strip_url(url)).exclude(
+            pk=pk
+        )
+        similar_urls = [
+            cls.strip_url(s.url)
+            for s in similar_urls
+            if cls.strip_url(s.url) == cls.strip_url(url)
+        ]
+        if len(similar_urls):
+            raise ValidationError(
+                "This url has already been entered", params={"url": url},
+            )
 
 
 class SourceDetail(models.Model):
