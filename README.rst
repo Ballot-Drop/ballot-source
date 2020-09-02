@@ -19,14 +19,15 @@ This is currently the resource to store and check sites for changes. It would be
 
 Getting set up locally
 ----------------------
-1. Git clone
-1. Set up and start a virtual environment: 
-    1. `python3 venv venv` or `pyenv exec python3 -m venv venv` if you're using pyenv
-    1. `source venv/bin/activate`
-1. Install requirements: `pip install -r requirements/local.txt`
-1. Install pre-commit: `pre-commit install` -- This will run a bunch of stuff every time you commit
-1. Migrate: `python manage.py migrate`
-1. Run server: `python manage.py runserver`
+
+#. Git clone
+#. Set up and start a virtual environment: 
+    #. `python3 venv venv` or `pyenv exec python3 -m venv venv` if you're using pyenv
+    #. `source venv/bin/activate`
+#. Install requirements: `pip install -r requirements/local.txt`
+#. Install pre-commit: `pre-commit install` -- This will run a bunch of stuff every time you commit
+#. Migrate: `python manage.py migrate`
+#. Run server: `python manage.py runserver`
 
 Any issues? Slack
 
