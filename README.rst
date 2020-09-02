@@ -13,6 +13,22 @@ Ballot Drop source
 
 :License: MIT
 
+This is currently the resource to store and check sites for changes. It would be good to build it to also scrape those changes and update the data behind https://github.com/ballot-Drop/ballot-drop. 
+
+**Want to help?** Join us on Slack: https://join.slack.com/t/ballotdrop/shared_invite/zt-hdeyo1vk-VarchL5nx0ok1NpMfZh0fQ
+
+Getting set up locally
+----------------------
+1. Git clone
+1. Set up and start a virtual environment: 
+    1. `python3 venv venv` or `pyenv exec python3 -m venv venv` if you're using pyenv
+    1. `source venv/bin/activate`
+1. Install requirements: `pip install -r requirements/local.txt`
+1. Install pre-commit: `pre-commit install` -- This will run a bunch of stuff every time you commit
+1. Migrate: `python manage.py migrate`
+1. Run server: `python manage.py runserver`
+
+Any issues? Slack
 
 Settings
 --------
