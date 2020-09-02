@@ -21,9 +21,9 @@ Getting set up locally
 ----------------------
 
 #. Git clone
-#. Set up and start a virtual environment: 
-    #. `python3 venv venv` or `pyenv exec python3 -m venv venv` if you're using pyenv
-    #. `source venv/bin/activate`
+#. Set up and start a virtual environment
+  #. `python3 venv venv` or `pyenv exec python3 -m venv venv` if you're using pyenv
+  #. `source venv/bin/activate`
 #. Install requirements: `pip install -r requirements/local.txt`
 #. Install pre-commit: `pre-commit install` -- This will run a bunch of stuff every time you commit
 #. Migrate: `python manage.py migrate`
