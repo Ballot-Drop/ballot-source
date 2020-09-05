@@ -5,20 +5,22 @@
             'subscribe': 'POST',
             'unsubscribe': 'DELETE'
         };
+        const _this = $(this);
         $.ajax({
             url: urls['subscribe'],
             data: {pk: $(this).data('pk'), action: methods[$(this).data('action')] || "get"},
             method: "POST",
             success: function(data, status, jqXHR) {
-                console.log('success');
-                console.log(data);
-                console.log(status);
-                console.log(jqXHR);
+                if( _this.data('action') === "unsubscribe" && data.status === "unsubscribed" ){
+                    _this.text("Subscribe");
+                    _this.data('action', 'subscribe');
+                } else if (_this.data('action') === "subscribe" && data.status === "subscribed" ) {
+                    _this.text("Unsubscribe");
+                    _this.data('action', 'unsubscribe');
+                }
             },
             error: function(jqXHR, status, e) {
-                console.log(jqXHR);
-                console.log(status);
-                console.log(e);
+                // do nothing
             }
         });
         return false;
