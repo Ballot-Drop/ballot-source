@@ -1,7 +1,11 @@
-from django.core.exceptions import ValidationError
-from django.test import TestCase
+from unittest.mock import patch
 
-from .models import Source, SourceDetail
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.shortcuts import reverse
+from django.test import Client, TestCase
+
+from .models import Source, SourceDetail, requests
 
 
 class SourceDetailTestCase(TestCase):
@@ -67,3 +71,66 @@ class SourceDetailTestCase(TestCase):
         for dupe in duplicates:
             with self.assertRaises(ValidationError):
                 Source.objects.create(url=dupe)
+
+
+class TestUserSourceSubscription(TestCase):
+    @patch.object(requests, "get")  # avoid testing for real urls
+    def setUp(self, mock_validate):
+        self.source1 = Source.objects.create(url="http://test1.com")
+        self.source2 = Source.objects.create(url="http://test2.com")
+        self.subscribe_url = reverse("sources:subscribe")
+        self.client = Client()
+
+        self.user = get_user_model().objects.create()
+        self.client.force_login(self.user)
+
+    def test_subscribe__no_pk(self):
+        self.assertEqual(
+            self.client.get(self.subscribe_url).json()["status"],
+            "Source matching pk does not exist",
+        )
+        self.assertEqual(
+            self.client.post(self.subscribe_url).json()["status"],
+            "Source matching pk does not exist",
+        )
+        self.assertEqual(
+            self.client.delete(self.subscribe_url).json()["status"],
+            "Source matching pk does not exist",
+        )
+
+    def test_subscribe__get(self):
+        res = self.client.get(self.subscribe_url, {"pk": self.source1.pk})
+        self.assertFalse(res.json().get("status"))
+
+        self.source1.user_subscription.add(self.user)
+
+        res = self.client.get(self.subscribe_url, {"pk": self.source1.pk})
+        self.assertTrue(res.json().get("status"))
+
+    def test_subscribe__post(self):
+        # test no action
+        res = self.client.post(self.subscribe_url, {"pk": self.source1.pk})
+        self.assertEqual(res.json().get("status"), "subscribed")
+
+        res = self.client.post(
+            self.subscribe_url, {"pk": self.source2.pk, "action": "POST"}
+        )
+        self.assertEqual(res.json().get("status"), "subscribed")
+
+        res = self.client.post(
+            self.subscribe_url, {"pk": self.source2.pk, "action": "POST"}
+        )
+        self.assertEqual(res.json().get("status"), "already subscribed")
+
+    def test_subscribe__delete(self):
+        res = self.client.post(
+            self.subscribe_url, {"pk": self.source1.pk, "action": "DELETE"}
+        )
+        self.assertEqual(res.json().get("status"), "user is not subscribed")
+
+        self.source1.user_subscription.add(self.user)
+
+        res = self.client.post(
+            self.subscribe_url, {"pk": self.source1.pk, "action": "DELETE"}
+        )
+        self.assertEqual(res.json().get("status"), "unsubscribed")

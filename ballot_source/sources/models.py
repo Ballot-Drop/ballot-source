@@ -43,6 +43,9 @@ class Source(models.Model):
     )
     fips = models.CharField(max_length=5, blank=True, null=True)
     state = models.CharField(choices=STATES, blank=True, null=True, max_length=2)
+    user_subscription = models.ManyToManyField(
+        to=get_user_model(), related_name="subscribed_diffs"
+    )
 
     def __str__(self):
         return f"{self.source_type}: {self.url}"

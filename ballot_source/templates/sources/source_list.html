@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <h2>Sources</h2>
   <a href="{% url 'sources:new' %}">Add new source</a><br />
   <a href="{% url 'sources:scrape' %}">Scrape all sources</a>
@@ -14,8 +15,11 @@
     last changed:
     <a href="{%url 'sources:diff' source_pk=source.pk pk=source.last_changed.pk %}">
       {{source.last_changed.date_pulled}}
-    </a>
+    </a><br />
+    <a href="#" class="js-subscribe" data-action="subscribe" data-pk="{{ source.pk }}">Subscribe</a>
+    <a href="#" class="js-subscribe" data-action="unsubscribe" data-pk="{{ source.pk }}">Unsubscribe</a>
   </li>
   {% endfor %}
-</ul>
+</ul
+
 {% endblock %}
