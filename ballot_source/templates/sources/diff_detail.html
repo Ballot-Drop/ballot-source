@@ -5,6 +5,12 @@
 {{diff.source}} <br />
   <a href="{% url 'sources:detail' pk=diff.source.pk %}">View source</a> -
   <a href="{% url 'sources:edit' pk=diff.source.pk %}">Edit source</a><br />
+  {%  if user in diff.source.user_subscription.all %}
+    <a href="#" class="js-subscribe" data-action="unsubscribe" data-pk="{{ diff.source.pk }}">Unsubscribe</a>
+  {% else %}
+    <a href="#" class="js-subscribe" data-action="subscribe" data-pk="{{ diff.source.pk }}">Subscribe</a>
+  {% endif %}
+  <br />
 
 
 {% if diff.previous_diff %}
