@@ -129,3 +129,14 @@ class ScrapeView(LoginRequiredMixin, TemplateView):
 
             context["changes"] = changes
         return context
+
+
+class SubscriptionList(LoginRequiredMixin, ListView):
+    model = Source
+    template_name = "sources/subscription_list.html"
+    context_object_name = "sources"
+
+    def get_queryset(self):
+        queryset = super(SubscriptionList, self).get_queryset()
+        queryset = queryset.filter(user_subscription__in=[self.request.user])
+        return queryset

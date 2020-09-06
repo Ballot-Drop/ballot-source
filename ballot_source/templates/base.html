@@ -49,8 +49,16 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'about' %}">About</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'sources:index' %}">Sources</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Sources
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{% url 'sources:index' %}">Sources</a>
+                <a class="dropdown-item" href="{% url 'sources:new' %}">Add new source</a>
+                <a class="dropdown-item" href="{% url 'sources:subscriptions' %}">Manage subscriptions</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'sources:scrape' %}">Scrape</a>
             </li>
             {% if request.user.is_authenticated %}
               <li class="nav-item">

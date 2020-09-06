@@ -9,6 +9,7 @@ from .views import (
     SourceEditView,
     SourceFormView,
     SourceListView,
+    SubscriptionList,
 )
 
 app_name = "sources"
@@ -21,4 +22,5 @@ urlpatterns = [
     path("<int:source_pk>/<int:pk>", DiffView.as_view(), name="diff"),
     path("scrape/<int:pk>", ScrapeView.as_view(), name="scrape"),
     path("scrape", ScrapeView.as_view(), name="scrape"),
+    path("subscriptions", SubscriptionList.as_view(), name="subscriptions"),
 ]

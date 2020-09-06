@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h2>{{ user }} Subscriptions</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>State</th>
+        <th>County</th>
+        <th>Url (clicking goes to detail page)</th>
+        <th>Unsubscribe</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for source in sources %}
+      <tr>
+        <td>{{ source.source_type }}</td>
+        <td>{{ source.state }}</td>
+        <td>{{ source.fips }}</td>
+        <td>{{ source.url }}</td>
+        <td><a href="#" class="js-subscribe" data-action="unsubscribe" data-pk="{{ source.pk }}">Unsubscribe</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+
+{% endblock %}
