@@ -52,7 +52,8 @@ class Source(models.Model):
 
     def save(self, *args, **kwargs):
         # Check for duplicate url
-        Source.validate_url(self.url, self.pk)
+        if not self.pk:
+            Source.validate_url(self.url, self.pk)
 
         pull_source = self.pk is None
         super(Source, self).save(*args, **kwargs)
