@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <h2>Sources</h2>
   <a href="{% url 'sources:new' %}">Add new source</a><br />
   <a href="{% url 'sources:scrape' %}">Scrape all sources</a>
-<ul>
+<ul class="spaced-list">
   {% for source in object_list %}
   <li>
     <a href="{{ source.url }}">{{source.url}} <small>Links offsite</small></a><br />
@@ -14,8 +15,14 @@
     last changed:
     <a href="{%url 'sources:diff' source_pk=source.pk pk=source.last_changed.pk %}">
       {{source.last_changed.date_pulled}}
-    </a>
+    </a><br />
+    {%  if user in source.user_subscription.all %}
+      <a href="#" class="js-subscribe" data-action="unsubscribe" data-pk="{{ source.pk }}">Unsubscribe</a>
+    {% else %}
+      <a href="#" class="js-subscribe" data-action="subscribe" data-pk="{{ source.pk }}">Subscribe</a>
+    {% endif %}
   </li>
   {% endfor %}
 </ul>
+
 {% endblock %}

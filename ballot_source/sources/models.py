@@ -43,13 +43,17 @@ class Source(models.Model):
     )
     fips = models.CharField(max_length=5, blank=True, null=True)
     state = models.CharField(choices=STATES, blank=True, null=True, max_length=2)
+    user_subscription = models.ManyToManyField(
+        to=get_user_model(), related_name="subscribed_diffs"
+    )
 
     def __str__(self):
         return f"{self.source_type}: {self.url}"
 
     def save(self, *args, **kwargs):
         # Check for duplicate url
-        Source.validate_url(self.url, self.pk)
+        if not self.pk:
+            Source.validate_url(self.url, self.pk)
 
         pull_source = self.pk is None
         super(Source, self).save(*args, **kwargs)

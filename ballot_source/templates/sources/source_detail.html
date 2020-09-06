@@ -4,6 +4,12 @@
 <h2>Source Detail</h2>
 {{object}} - <a href="{% url 'sources:edit' pk=object.pk %}">Edit</a> -
   <a href="{% url 'sources:scrape' pk=object.pk %}">Scrape</a>
+  <br />
+  {%  if user in object.user_subscription.all %}
+    <a href="#" class="js-subscribe" data-action="unsubscribe" data-pk="{{ object.pk }}">Unsubscribe</a>
+  {% else %}
+    <a href="#" class="js-subscribe" data-action="subscribe" data-pk="{{ object.pk }}">Subscribe</a>
+  {% endif %}
 <ul>
 {% for detail in object.details.all %}
   <li><a href="{% url 'sources:diff' source_pk=detail.source.pk pk=detail.pk %}">{{detail.date_pulled}}</a></li>
