@@ -1,7 +1,7 @@
 Ballot Source
 =============
 
-Ballot Drop source 
+Ballot Drop source
 
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
      :target: https://github.com/pydanny/cookiecutter-django/
@@ -13,9 +13,9 @@ Ballot Drop source
 
 :License: MIT
 
-This is currently the resource to store and check sites for changes. It would be good to build it to also scrape those changes and update the data behind https://github.com/ballot-Drop/ballot-drop. 
+This is currently the resource to store and check sites for changes. It would be good to build it to also scrape those changes and update the data behind https://github.com/ballot-Drop/ballot-drop.
 
-**Want to help?** Join us on Slack: https://join.slack.com/t/ballotdrop/shared_invite/zt-hdeyo1vk-VarchL5nx0ok1NpMfZh0fQ
+**Want to help?** Join us on our Slack: https://join.slack.com/t/ballotdrop/shared_invite/zt-hdeyo1vk-VarchL5nx0ok1NpMfZh0fQ
 
 Getting set up locally
 ----------------------
@@ -25,7 +25,7 @@ Getting set up locally
 
    #. `python3 venv venv` or `pyenv exec python3 -m venv venv` if you're using pyenv
    #. `source venv/bin/activate`
-    
+
 #. Install requirements: `pip install -r requirements/local.txt`
 #. Install pre-commit: `pre-commit install` -- This will run a bunch of stuff every time you commit
 #. Migrate: `python manage.py migrate`
@@ -111,7 +111,3 @@ Heroku
 See detailed `cookiecutter-django Heroku documentation`_.
 
 .. _`cookiecutter-django Heroku documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-on-heroku.html
-
-
-
-
